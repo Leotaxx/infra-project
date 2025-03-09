@@ -1,0 +1,36 @@
+- name: Configure Multi-Region Web Server
+  hosts: webservers
+  become: true
+  tasks:
+    - name: Install Apache (Amazon Linux & RHEL)
+      ansible.builtin.yum:
+        name: httpd
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Install Apache (Ubuntu & Debian)
+      ansible.builtin.apt:
+        name: apache2
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Start and Enable Apache
+      ansible.builtin.service:
+        name: "{{ 'httpd' if ansible_os_family == 'RedHat' else 'apache2' }}"
+        state: started
+        enabled: true
+
+    - name: Create a Default Web Page
+      ansible.builtin.copy:
+        content: "<h1>Welcome to Retail Web Server</h1>"
+        dest: /var/www/html/index.html
+        mode: "0644"
+
+    - name: Set Correct Ownership for Web Directory
+      ansible.builtin.file:
+        path: /var/www/html/
+        owner: apache
+        group: apache
+        mode: "0755"
+        recurse: yes

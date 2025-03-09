@@ -1,0 +1,22 @@
+{
+  "db_host": {
+    "sensitive": false,
+    "type": "string",
+    "value": "retail-rds-instance.czpvwh85n4fa.us-east-1.rds.amazonaws.com"
+  },
+  "db_password_secret_arn": {
+    "sensitive": true,
+    "type": "string",
+    "value": "arn:aws:secretsmanager:us-east-1:576984175426:secret:retail-rds-pw-qjH5ok"
+  },
+  "web_primary_ip": {
+    "sensitive": false,
+    "type": "string",
+    "value": "3.94.4.18"
+  },
+  "web_secondary_ip": {
+    "sensitive": false,
+    "type": "string",
+    "value": "3.237.182.248"
+  }
+}

@@ -1,0 +1,27 @@
+- name: Setup RDS Database
+  hosts: localhost
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: Retrieve DB Password from AWS Secrets Manager
+      shell: >
+        aws secretsmanager get-secret-value 
+        --secret-id {{ db_password_secret_arn }} 
+        --query "SecretString" 
+        --output text
+      register: db_password_output
+
+    - name: Install MySQL Client
+      pip:
+        name:
+          - pymysql
+          - mysqlclient
+        state: present
+
+    - name: Create Database
+      mysql_db:
+        name: retaildb
+        login_host: "{{ db_host }}"
+        login_user: "admin"
+        login_password: "{{ db_password_output.stdout }}"
+        state: present

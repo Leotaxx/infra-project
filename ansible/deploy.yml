@@ -1,0 +1,19 @@
+- name: Deploy Application with AWS CodeDeploy
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Install AWS CLI
+      yum:
+        name: aws-cli
+        state: present
+
+    - name: Download Deployment Package
+      get_url:
+        url: "https://webapp-codepipeline-bucket.s3.amazonaws.com/latest.zip"
+        dest: "/var/www/html/webapp.zip"
+
+    - name: Unzip Application Files
+      ansible.builtin.unarchive:
+        src: "/var/www/html/webapp.zip"
+        dest: "/var/www/html/"
+        remote_src: yes
