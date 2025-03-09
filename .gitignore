@@ -1,0 +1,44 @@
+# Ignore Python virtual environments
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore Terraform local files
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+crash.log
+terraform.tfvars
+terraform.tfvars.json
+
+# Ignore Ansible cache and logs
+*.retry
+ansible.log
+inventory.json
+secrets.yml
+
+# Ignore system and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Ignore SSH keys (DO NOT push private keys!)
+*.pem
+*.key
+id_rsa*
+id_ecdsa*
+id_ed25519*
+
+# Ignore any credentials or sensitive files
+*.env
+.envrc
+secrets.json
+aws_credentials
+
+# Ignore build artifacts
+*.zip
+*.tar.gz
