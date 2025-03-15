@@ -1,4 +1,7 @@
 provider "aws" {
+  region = var.aws_region_primary
+}
+provider "aws" {
   alias  = "primary"
   region = "us-east-1"
   access_key = var.aws_access_key
