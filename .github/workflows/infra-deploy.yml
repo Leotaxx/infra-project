@@ -48,15 +48,14 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
         working-directory: terraform
-      - name: Extract Terraform Outputs
+      - name: Set Terraform Outputs as Job Outputs
         id: export
         run: |
           echo "Extracting Terraform Outputs..."
-          terraform output -json > tf_output.json
-          DB_HOST=$(jq -r '.db_host.value' tf_output.json)
-          DB_PASSWORD_SECRET_ARN=$(jq -r '.db_password_secret_arn.value' tf_output.json)
-          WEB_PRIMARY_IP=$(jq -r '.web_primary_ip.value' tf_output.json)
-          WEB_SECONDARY_IP=$(jq -r '.web_secondary_ip.value' tf_output.json)
+          DB_HOST=$(terraform output -raw db_host)
+          DB_PASSWORD_SECRET_ARN=$(terraform output -raw db_password_secret_arn)
+          WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip)
+          WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip)
 
           # Debugging logs
           echo "Extracted DB_HOST: $DB_HOST"
@@ -64,11 +63,11 @@ jobs:
           echo "Extracted WEB_PRIMARY_IP: $WEB_PRIMARY_IP"
           echo "Extracted WEB_SECONDARY_IP: $WEB_SECONDARY_IP"
 
-          # Set outputs for subsequent steps
-          echo "::set-output name=DB_HOST::$DB_HOST"
-          echo "::set-output name=DB_PASSWORD_SECRET_ARN::$DB_PASSWORD_SECRET_ARN"
-          echo "::set-output name=WEB_PRIMARY_IP::$WEB_PRIMARY_IP"
-          echo "::set-output name=WEB_SECONDARY_IP::$WEB_SECONDARY_IP"
+          # Store outputs in GITHUB_OUTPUT
+          echo "DB_HOST=$DB_HOST" >> $GITHUB_OUTPUT
+          echo "DB_PASSWORD_SECRET_ARN=$DB_PASSWORD_SECRET_ARN" >> $GITHUB_OUTPUT
+          echo "WEB_PRIMARY_IP=$WEB_PRIMARY_IP" >> $GITHUB_OUTPUT
+          echo "WEB_SECONDARY_IP=$WEB_SECONDARY_IP" >> $GITHUB_OUTPUT
         working-directory: terraform
       # - name: Upload Inventory JSON
       #   uses: actions/upload-artifact@v4
