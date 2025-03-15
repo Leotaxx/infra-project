@@ -49,8 +49,10 @@ jobs:
       - name: Set Terraform Outputs as Job Outputs
         id: export
         run: |
+          echo "Raw Terraform Output:"
+          terraform output -raw db_password_secret_arn
           echo "DB_HOST=$(terraform output -raw db_host 2>/dev/null | tr -d '\n')" >> $GITHUB_OUTPUT
-          echo "DB_PASSWORD_SECRET_ARN=$(terraform output -raw db_password_secret_arn 2>/dev/null | tr -d '\n')" >> $GITHUB_OUTPUT
+          echo "DB_PASSWORD_SECRET_ARN=$(terraform output -raw db_password_secret_arn | awk 'NR==1' | tr -d '\n')" >> $GITHUB_OUTPUT
           echo "WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip 2>/dev/null | tr -d '\n')" >> $GITHUB_OUTPUT
           echo "WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip 2>/dev/null | tr -d '\n')" >> $GITHUB_OUTPUT
         working-directory: terraform
