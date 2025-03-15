@@ -21,12 +21,13 @@ jobs:
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws configure set aws_secret_session_token ${{ secrets.AWS_SESSION_TOKEN }}
           aws configure set region us-east-1
-          echo "Testing AWS Credentials..."
-          aws sts get-caller-identity
-      - name: Terraform Init
-        run: terraform init
-        working-directory: terraform
 
+      - name: Terraform Init
+        run: terraform init -backend-config="bucket=infra-project-terraform-state-bucket"
+        working-directory: terraform
+      - name: Terraform Format Check
+        run: terraform fmt -check
+        working-directory: terraform
       - name: Terraform Plan
         run: terraform plan -out=tfplan
         working-directory: terraform
@@ -36,7 +37,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: terraform apply -auto-approve -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" -var "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" -var "aws_secret_session_token=${{ secrets.AWS_SESSION_TOKEN }}"
+        run: terraform apply -auto-approve
         working-directory: terraform
       - name: Update Inventory JSON
         run: |
