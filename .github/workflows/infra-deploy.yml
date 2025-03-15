@@ -39,6 +39,13 @@ jobs:
         with:
           name: terraform-state
           path: terraform/terraform.tfstate
+      - name: Save Terraform Binary
+        run: cp $(which terraform) terraform-bin
+      - name: Upload Terraform Binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-binary
+          path: terraform-bin
 
   ansible:
     needs: terraform
@@ -51,10 +58,18 @@ jobs:
         with:
           name: terraform-state
           path: terraform
+      - name: Download Terraform Binary
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-binary
+          path: /usr/local/bin
+      - name: Make Terraform Executable
+        run: chmod +x /usr/local/bin/terraform
       - name: Terraform Output
         id: terraform_output
         run: |
           ls -l
+          pwd
           echo "WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip)" >> $GITHUB_ENV
           echo "WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip)" >> $GITHUB_ENV
         working-directory: terraform # ✅ Set working directory
