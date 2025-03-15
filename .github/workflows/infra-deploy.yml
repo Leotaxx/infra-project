@@ -9,6 +9,11 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    outputs:
+      DB_HOST: ${{ steps.export.outputs.DB_HOST }}
+      DB_PASSWORD_SECRET_ARN: ${{ steps.export.outputs.DB_PASSWORD_SECRET_ARN }}
+      WEB_PRIMARY_IP: ${{ steps.export.outputs.WEB_PRIMARY_IP }}
+      WEB_SECONDARY_IP: ${{ steps.export.outputs.WEB_SECONDARY_IP }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -41,12 +46,13 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
         working-directory: terraform
-      - name: Set Environment Variables from Terraform Outputs
+      - name: Set Terraform Outputs as Job Outputs
+        id: export
         run: |
-          echo "DB_HOST=$(terraform output -raw db_host 2>/dev/null | tr -d '\n')" >> $GITHUB_ENV
-          echo "DB_PASSWORD_SECRET_ARN=$(terraform output -raw db_password_secret_arn 2>/dev/null | tr -d '\n')" >> $GITHUB_ENV
-          echo "WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip 2>/dev/null | tr -d '\n')" >> $GITHUB_ENV
-          echo "WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip 2>/dev/null | tr -d '\n')" >> $GITHUB_ENV
+          echo "DB_HOST=$(terraform output -raw db_host 2>/dev/null | tr -d '\n')" >> $GITHUB_OUTPUT
+          echo "DB_PASSWORD_SECRET_ARN=$(terraform output -raw db_password_secret_arn 2>/dev/null | tr -d '\n')" >> $GITHUB_OUTPUT
+          echo "WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip 2>/dev/null | tr -d '\n')" >> $GITHUB_OUTPUT
+          echo "WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip 2>/dev/null | tr -d '\n')" >> $GITHUB_OUTPUT
         working-directory: terraform
       # - name: Upload Inventory JSON
       #   uses: actions/upload-artifact@v4
