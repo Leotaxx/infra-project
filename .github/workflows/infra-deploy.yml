@@ -97,6 +97,14 @@ jobs:
           chmod 600 ~/.ssh/trojan.pem
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/trojan.pem
+      - name: Configure AWS Credentials
+        run: |
+          echo "Configuring AWS credentials..."
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          if [ -n "${{ secrets.AWS_SESSION_TOKEN }}" ]; then
+            aws configure set aws_session_token ${{ secrets.AWS_SESSION_TOKEN }}
+          fi
       - name: Retrieve DB Password from AWS Secrets Manager
         run: |
           env
@@ -104,9 +112,15 @@ jobs:
             echo "Error: DB_PASSWORD_SECRET_ARN is missing!" && exit 1
           fi
           echo "DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${{ env.DB_PASSWORD_SECRET_ARN }} --query 'SecretString' --output text)" >> $GITHUB_ENV
+      - name: Generate Ansible Inventory
+        run: |
+          echo "[webservers]" > inventory
+          echo "${{ env.WEB_PRIMARY_IP }}" >> inventory
+          echo "${{ env.WEB_SECONDARY_IP }}" >> inventory
+          working-directory: ansible
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook  webserver.yml -e "target_hosts=${{ env.WEB_PRIMARY_IP }},${{ env.WEB_SECONDARY_IP }}"
+          ansible-playbook -i inventory webserver.yml
         working-directory: ansible
       - name: Install MySQL Client
         run: |
