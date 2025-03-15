@@ -50,23 +50,16 @@ jobs:
         id: export
         run: |
           echo "Extracting Terraform Outputs..."
-          DB_HOST=$(terraform output db_host | tr -d '"')
-          DB_PASSWORD_SECRET_ARN=$(terraform output db_password_secret_arn | tr -d '"')
-          WEB_PRIMARY_IP=$(terraform output web_primary_ip | tr -d '"')
-          WEB_SECONDARY_IP=$(terraform output web_secondary_ip | tr -d '"')
-
+          echo "DB_HOST=$(terraform output -raw db_host)" >> $GITHUB_OUTPUT
+          echo "DB_PASSWORD_SECRET_ARN=$(terraform output -raw db_password_secret_arn)" >> $GITHUB_OUTPUT
+          echo "WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip)" >> $GITHUB_OUTPUT
+          echo "WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip)" >> $GITHUB_OUTPUT
 
           # Debugging logs
-          echo "Extracted DB_HOST: $DB_HOST"
-          echo "Extracted DB_PASSWORD_SECRET_ARN: $DB_PASSWORD_SECRET_ARN"
-          echo "Extracted WEB_PRIMARY_IP: $WEB_PRIMARY_IP"
-          echo "Extracted WEB_SECONDARY_IP: $WEB_SECONDARY_IP"
-
-          # Store outputs in GITHUB_OUTPUT
-          echo "DB_HOST=$DB_HOST" >> $GITHUB_OUTPUT
-          echo "DB_PASSWORD_SECRET_ARN=$DB_PASSWORD_SECRET_ARN" >> $GITHUB_OUTPUT
-          echo "WEB_PRIMARY_IP=$WEB_PRIMARY_IP" >> $GITHUB_OUTPUT
-          echo "WEB_SECONDARY_IP=$WEB_SECONDARY_IP" >> $GITHUB_OUTPUT
+          echo "Extracted DB_HOST: $(terraform output -raw db_host)"
+          echo "Extracted DB_PASSWORD_SECRET_ARN: $(terraform output -raw db_password_secret_arn)"
+          echo "Extracted WEB_PRIMARY_IP: $(terraform output -raw web_primary_ip)"
+          echo "Extracted WEB_SECONDARY_IP: $(terraform output -raw web_secondary_ip)"
         working-directory: terraform
       # - name: Upload Inventory JSON
       #   uses: actions/upload-artifact@v4
