@@ -50,7 +50,7 @@ jobs:
         working-directory: terraform
       - name: Run Terraform
         id: terraform-output
-        run: terraform output -json
+        run: terraform output
       - name: Process Terraform Output
         run: |
           echo "${{ steps.terraform-output.outputs.stdout }}" > output.json
