@@ -41,14 +41,17 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
       - name: Terraform Output
         id: terraform_output
         run: |
           echo "WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip)" >> $GITHUB_ENV
           echo "WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip)" >> $GITHUB_ENV
-        working-directory: terraform
+        working-directory: infra-project/terraform # ✅ Set working directory
+
       - name: Install Ansible
         run: sudo apt update && sudo apt install -y ansible
+        working-directory: infra-project/ansible # ✅ Ensure correct directory
 
       - name: Setup SSH Key
         run: |
@@ -57,11 +60,14 @@ jobs:
           chmod 600 ~/.ssh/trojan.pem
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/trojan.pem
+        working-directory: infra-project/ansible # ✅ Ensure correct directory
 
       - name: Verify SSH Connection
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/trojan.pem ec2-user@${{ env.WEB_PRIMARY_IP }} "echo 'Primary Server SSH Connection Successful'"
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/trojan.pem ec2-user@${{ env.WEB_SECONDARY_IP }} "echo 'Secondary Server SSH Connection Successful'"
+        working-directory: infra-project/ansible # ✅ Ensure correct directory
 
       - name: Run Ansible Playbook
-        run: ansible-playbook -i ansible/inventory.py ansible/webserver.yml
+        run: ansible-playbook -i inventory.py webserver.yml
+        working-directory: infra-project/ansible # ✅ Set the correct directory
