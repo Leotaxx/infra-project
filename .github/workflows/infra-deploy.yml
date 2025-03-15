@@ -114,9 +114,9 @@ jobs:
           echo "DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${{ env.DB_PASSWORD_SECRET_ARN }} --query 'SecretString' --output text)" >> $GITHUB_ENV
       - name: Generate Ansible Inventory
         run: |
-          echo "[webservers]" > inventory
-          echo "${{ env.WEB_PRIMARY_IP }}" >> inventory
-          echo "${{ env.WEB_SECONDARY_IP }}" >> inventory
+          echo "[webservers]" > ansible/inventory
+          echo "${{ env.WEB_PRIMARY_IP }}" >> ansible/inventory
+          echo "${{ env.WEB_SECONDARY_IP }}" >> ansible/inventory
           working-directory: ansible
       - name: Run Ansible Playbook
         run: |
