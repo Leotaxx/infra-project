@@ -50,10 +50,10 @@ jobs:
         id: export
         run: |
           echo "Extracting Terraform Outputs..."
-          DB_HOST=$(terraform output -raw db_host 2>/dev/null | awk '{print $1}')
-          DB_PASSWORD_SECRET_ARN=$(terraform output -raw db_password_secret_arn 2>/dev/null | awk '{print $1}')
-          WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip 2>/dev/null | awk '{print $1}')
-          WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip 2>/dev/null | awk '{print $1}')
+          DB_HOST=$(terraform output db_host | tr -d '"')
+          DB_PASSWORD_SECRET_ARN=$(terraform output db_password_secret_arn | tr -d '"')
+          WEB_PRIMARY_IP=$(terraform output web_primary_ip | tr -d '"')
+          WEB_SECONDARY_IP=$(terraform output web_secondary_ip | tr -d '"')
 
 
           # Debugging logs
