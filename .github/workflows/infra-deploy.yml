@@ -41,20 +41,18 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
         working-directory: terraform
-      - name: Update Inventory JSON
-        run: |
-          terraform output -json > $GITHUB_WORKSPACE/ansible/inventory.json
-          cat $GITHUB_WORKSPACE/ansible/inventory.json
-        working-directory: terraform
       - name: Set Environment Variables from Terraform Outputs
         run: |
-          echo "DB_HOST=$(jq -r '.db_host.value' ansible/inventory.json)" >> $GITHUB_ENV
-          echo "DB_PASSWORD_SECRET_ARN=$(jq -r '.db_password_secret_arn.value' ansible/inventory.json)" >> $GITHUB_ENV
-      - name: Upload Inventory JSON
-        uses: actions/upload-artifact@v4
-        with:
-          name: inventory
-          path: ansible/inventory.json
+          echo "DB_HOST=$(terraform output -raw db_host)" >> $GITHUB_ENV
+          echo "DB_PASSWORD_SECRET_ARN=$(terraform output -raw db_password_secret_arn)" >> $GITHUB_ENV
+          echo "WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip)" >> $GITHUB_ENV
+          echo "WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip)" >> $GITHUB_ENV
+        working-directory: terraform
+      # - name: Upload Inventory JSON
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: inventory
+      #     path: ansible/inventory.json
 
   ansible:
     needs: terraform
@@ -65,11 +63,6 @@ jobs:
 
       - name: Install Ansible
         run: sudo apt update && sudo apt install -y ansible
-      - name: Download Inventory JSON
-        uses: actions/download-artifact@v4
-        with:
-          name: inventory
-          path: ansible
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
@@ -83,11 +76,10 @@ jobs:
             echo "Error: DB_PASSWORD_SECRET_ARN is missing!" && exit 1
           fi
           echo "DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${{ env.DB_PASSWORD_SECRET_ARN }} --query 'SecretString' --output text)" >> $GITHUB_ENV
-            - name: Run Ansible Playbook
-              run: |
-                cat inventory.json    
-                ansible-playbook -i inventory.json webserver.yml
-              working-directory: ansible
+      - name: Run Ansible Playbook
+        run: |
+          ansible-playbook -i "${{ env.WEB_PRIMARY_IP }},${{ env.WEB_SECONDARY_IP }}" webserver.yml
+        working-directory: ansible
       - name: Install MySQL Client
         run: |
           sudo apt update
