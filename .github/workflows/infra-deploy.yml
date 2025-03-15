@@ -15,17 +15,16 @@ jobs:
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
-
-      - name: Terraform Init
-        run: terraform init
-        working-directory: terraform
-
       - name: Configure AWS CLI
         run: |
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws configure set aws_secret_session_token ${{ secrets.AWS_SESSION_TOKEN }}
           aws configure set region us-east-1
+      - name: Terraform Init
+        run: terraform init
+        working-directory: terraform
+
       - name: Terraform Plan
         run: terraform plan -out=tfplan
         working-directory: terraform
