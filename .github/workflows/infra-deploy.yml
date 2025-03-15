@@ -44,6 +44,15 @@ jobs:
 
       - name: Install Ansible
         run: sudo apt update && sudo apt install -y ansible
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/trojan.pem
+          chmod 600 ~/.ssh/trojan.pem
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/trojan.pem
 
+      - name: Verify SSH Connection
+        run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/trojan.pem ec2-user@<YOUR_EC2_PUBLIC_IP> "echo 'SSH connection successful'"
       - name: Run Ansible Playbook
         run: ansible-playbook -i ansible/inventory.py ansible/webserver.yml
