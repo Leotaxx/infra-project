@@ -44,6 +44,13 @@ jobs:
 
       - name: Install Ansible
         run: sudo apt update && sudo apt install -y ansible
+      - name: Retrieve Terraform Outputs
+        id: tf_output
+        run: |
+          echo "Retrieving Terraform outputs..."
+          echo "WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip)" >> $GITHUB_ENV
+          echo "WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip)" >> $GITHUB_ENV
+        working-directory: terraform
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
@@ -53,6 +60,9 @@ jobs:
           ssh-add ~/.ssh/trojan.pem
 
       - name: Verify SSH Connection
-        run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/trojan.pem ec2-user@<YOUR_EC2_PUBLIC_IP> "echo 'SSH connection successful'"
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/trojan.pem ec2-user@${{ env.WEB_PRIMARY_IP }} "echo 'Primary Server SSH Connection Successful'"
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/trojan.pem ec2-user@${{ env.WEB_SECONDARY_IP }} "echo 'Secondary Server SSH Connection Successful'"
+
       - name: Run Ansible Playbook
         run: ansible-playbook -i ansible/inventory.py ansible/webserver.yml
