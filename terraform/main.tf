@@ -31,6 +31,3 @@ module "storage" {
 }
 
 
-module "cicd" {
-  source = "./modules/cicd"
-}
