@@ -15,10 +15,10 @@ provider "aws" {
 }
 terraform {
   backend "s3" {
-    bucket         = "your-terraform-state-bucket"
+    bucket         = "infra-project-terraform-state-bucket"
     key            = "infra/terraform.tfstate"
     region         = "us-east-1"
     encrypt        = true
-    dynamodb_table = "terraform-locks"
+    use_lockfile   = true  # ✅ Replace deprecated dynamodb_table
   }
 }
