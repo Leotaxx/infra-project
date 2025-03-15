@@ -68,5 +68,7 @@ jobs:
           ssh-add ~/.ssh/trojan.pem
 
       - name: Run Ansible Playbook
-        run: ansible-playbook -i inventory.py webserver.yml
+        run: |
+          cat inventory.json    
+          ansible-playbook -i inventory.py webserver.yml
         working-directory: ansible
