@@ -41,16 +41,15 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-
-      - name: Install Ansible
-        run: sudo apt update && sudo apt install -y ansible
-      - name: Retrieve Terraform Outputs
-        id: tf_output
+      - name: Terraform Output
+        id: terraform_output
         run: |
-          echo "Retrieving Terraform outputs..."
           echo "WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip)" >> $GITHUB_ENV
           echo "WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip)" >> $GITHUB_ENV
         working-directory: terraform
+      - name: Install Ansible
+        run: sudo apt update && sudo apt install -y ansible
+
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
