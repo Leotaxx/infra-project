@@ -26,8 +26,5 @@ module "database" {
   public_subnet_2_id = module.networking.public_subnet_2_id
 }
 
-module "storage" {
-  source = "./modules/storage"
-}
 
 
