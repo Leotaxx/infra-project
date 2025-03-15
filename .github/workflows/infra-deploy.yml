@@ -48,6 +48,11 @@ jobs:
           terraform output -json > $GITHUB_WORKSPACE/ansible/inventory.json
           cat $GITHUB_WORKSPACE/ansible/inventory.json
         working-directory: terraform
+      - name: Upload Inventory JSON
+        uses: actions/upload-artifact@v4
+        with:
+          name: inventory
+          path: ansible/inventory.json
 
   ansible:
     needs: terraform
@@ -58,7 +63,11 @@ jobs:
 
       - name: Install Ansible
         run: sudo apt update && sudo apt install -y ansible
-
+      - name: Download Inventory JSON
+        uses: actions/download-artifact@v4
+        with:
+          name: inventory
+          path: ansible
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
