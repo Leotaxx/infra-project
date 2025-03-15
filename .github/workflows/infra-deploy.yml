@@ -79,6 +79,7 @@ jobs:
     needs: terraform
     runs-on: ubuntu-latest
     env:
+      AWS_DEFAULT_REGION: us-east-1
       DB_HOST: ${{ needs.terraform.outputs.DB_HOST }}
       DB_PASSWORD_SECRET_ARN: ${{ needs.terraform.outputs.DB_PASSWORD_SECRET_ARN }}
       WEB_PRIMARY_IP: ${{ needs.terraform.outputs.WEB_PRIMARY_IP }}
@@ -105,7 +106,7 @@ jobs:
           echo "DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${{ env.DB_PASSWORD_SECRET_ARN }} --query 'SecretString' --output text)" >> $GITHUB_ENV
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook -i "${{ env.WEB_PRIMARY_IP }},${{ env.WEB_SECONDARY_IP }}" webserver.yml
+          ansible-playbook  webserver.yml -e "target_hosts=${{ env.WEB_PRIMARY_IP }},${{ env.WEB_SECONDARY_IP }}"
         working-directory: ansible
       - name: Install MySQL Client
         run: |

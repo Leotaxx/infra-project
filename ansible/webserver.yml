@@ -1,5 +1,5 @@
 - name: Configure Multi-Region Web Server
-  hosts: webservers
+  hosts: "{{ target_hosts }}"
   become: true
   tasks:
     - name: Install Apache (Amazon Linux & RHEL)
