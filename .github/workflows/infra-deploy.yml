@@ -35,7 +35,7 @@ jobs:
         run: terraform apply -auto-approve -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" -var "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" -var "aws_secret_session_token=${{ secrets.AWS_SESSION_TOKEN }}"
         working-directory: terraform
       - name: Save Terraform State
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: terraform-state
           path: terraform/terraform.tfstate
@@ -47,7 +47,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
       - name: Retrieve Terraform State
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: terraform-state
           path: terraform
