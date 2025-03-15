@@ -47,9 +47,9 @@ jobs:
           cat $GITHUB_WORKSPACE/ansible/inventory.json
         working-directory: terraform
       - name: Set Environment Variables from Terraform Outputs
-       run: |
-        echo "DB_HOST=$(jq -r '.db_host.value' ansible/inventory.json)" >> $GITHUB_ENV
-        echo "DB_PASSWORD_SECRET_ARN=$(jq -r '.db_password_secret_arn.value' ansible/inventory.json)" >> $GITHUB_ENV
+        run: |
+          echo "DB_HOST=$(jq -r '.db_host.value' ansible/inventory.json)" >> $GITHUB_ENV
+          echo "DB_PASSWORD_SECRET_ARN=$(jq -r '.db_password_secret_arn.value' ansible/inventory.json)" >> $GITHUB_ENV
       - name: Upload Inventory JSON
         uses: actions/upload-artifact@v4
         with:
