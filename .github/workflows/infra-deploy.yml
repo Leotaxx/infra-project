@@ -20,6 +20,8 @@ jobs:
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
       - name: Configure AWS Credentials
         run: |
           echo "Configuring AWS credentials..."
@@ -46,21 +48,12 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
         working-directory: terraform
-      - name: Set Terraform Outputs as Job Outputs
-        id: export
+      - name: Run Terraform
+        id: terraform-output
+        run: terraform output -json
+      - name: Process Terraform Output
         run: |
-          echo "Extracting Terraform Outputs..."
-          echo "DB_HOST=$(terraform output -raw db_host)" >> $GITHUB_OUTPUT
-          echo "DB_PASSWORD_SECRET_ARN=$(terraform output -raw db_password_secret_arn)" >> $GITHUB_OUTPUT
-          echo "WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip)" >> $GITHUB_OUTPUT
-          echo "WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip)" >> $GITHUB_OUTPUT
-
-          # Debugging logs
-          echo "Extracted DB_HOST: $(terraform output -raw db_host)"
-          echo "Extracted DB_PASSWORD_SECRET_ARN: $(terraform output -raw db_password_secret_arn)"
-          echo "Extracted WEB_PRIMARY_IP: $(terraform output -raw web_primary_ip)"
-          echo "Extracted WEB_SECONDARY_IP: $(terraform output -raw web_secondary_ip)"
-        working-directory: terraform
+          echo "${{ steps.terraform-output.outputs.stdout }}" > output.json
       # - name: Upload Inventory JSON
       #   uses: actions/upload-artifact@v4
       #   with:
