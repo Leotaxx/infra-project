@@ -43,10 +43,10 @@ jobs:
         working-directory: terraform
       - name: Set Environment Variables from Terraform Outputs
         run: |
-          echo "DB_HOST=$(terraform output -raw db_host)" >> $GITHUB_ENV
-          echo "DB_PASSWORD_SECRET_ARN=$(terraform output -raw db_password_secret_arn)" >> $GITHUB_ENV
-          echo "WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip)" >> $GITHUB_ENV
-          echo "WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip)" >> $GITHUB_ENV
+          echo "DB_HOST=$(terraform output -raw db_host 2>/dev/null | tr -d '\n')" >> $GITHUB_ENV
+          echo "DB_PASSWORD_SECRET_ARN=$(terraform output -raw db_password_secret_arn 2>/dev/null | tr -d '\n')" >> $GITHUB_ENV
+          echo "WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip 2>/dev/null | tr -d '\n')" >> $GITHUB_ENV
+          echo "WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip 2>/dev/null | tr -d '\n')" >> $GITHUB_ENV
         working-directory: terraform
       # - name: Upload Inventory JSON
       #   uses: actions/upload-artifact@v4
