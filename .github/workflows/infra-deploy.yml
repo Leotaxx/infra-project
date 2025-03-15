@@ -18,14 +18,16 @@ jobs:
       - name: Configure AWS Credentials
         run: |
           echo "Configuring AWS credentials..."
-          mkdir -p ~/.aws
-          echo "[default]" > ~/.aws/credentials
-          echo "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
-          echo "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
-          echo "aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}" >> ~/.aws/credentials
-          cat ~/.aws/credentials
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          if [ -n "${{ secrets.AWS_SESSION_TOKEN }}" ]; then
+            aws configure set aws_session_token ${{ secrets.AWS_SESSION_TOKEN }}
+          fi
       - name: Terraform Init
         run: terraform init -backend-config="bucket=infra-project-terraform-state-bucket"
+        working-directory: terraform
+      - name: Terraform Validate
+        run: terraform validate
         working-directory: terraform
       - name: Terraform Format Check
         run: |
@@ -37,11 +39,7 @@ jobs:
         working-directory: terraform
 
       - name: Terraform Apply
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve tfplan
         working-directory: terraform
       - name: Update Inventory JSON
         run: |
@@ -75,9 +73,23 @@ jobs:
           chmod 600 ~/.ssh/trojan.pem
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/trojan.pem
+      - name: Retrieve DB Password from AWS Secrets Manager
+        run: |
+          echo "DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${{ secrets.DB_PASSWORD_SECRET_ARN }} --query 'SecretString' --output text)" >> $GITHUB_ENV
 
       - name: Run Ansible Playbook
         run: |
-          cat inventory.json    
-          ansible-playbook -i inventory.py webserver.yml
+          cat ansible/inventory.json    
+          ansible-playbook -i inventory.json webserver.yml
         working-directory: ansible
+      - name: Install MySQL Client
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip
+          pip3 install pymysql mysqlclient
+      - name: Create Database
+        run: |
+          mysql -h "${{ env.DB_HOST }}" -u admin -p"${{ env.DB_PASSWORD }}" -e "CREATE DATABASE IF NOT EXISTS retaildb;"
+      - name: Increase Connection Limit
+        run: |
+          mysql -h "${{ env.DB_HOST }}" -u admin -p"${{ env.DB_PASSWORD }}" -e "SET GLOBAL max_connections = 200;"
