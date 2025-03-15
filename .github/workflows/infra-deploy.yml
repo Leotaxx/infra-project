@@ -26,6 +26,9 @@ jobs:
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws configure set aws_secret_session_token ${{ secrets.AWS_SESSION_TOKEN }}
           aws configure set region us-east-1
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+        working-directory: terraform
 
       - name: Terraform Apply
         env:

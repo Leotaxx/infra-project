@@ -5,6 +5,12 @@ resource "aws_instance" "web_primary" {
   security_groups = [var.web_sg_id]       # ✅ Use variable instead of module reference
   associate_public_ip_address = true
   key_name ="trojan"
+  lifecycle {
+    create_before_destroy = true
+  }
+  tags = {
+    Name = "Web Primary"
+  }
 }
 
 resource "aws_instance" "web_secondary" {
@@ -14,6 +20,12 @@ resource "aws_instance" "web_secondary" {
   security_groups = [var.web_sg_id]       # ✅ Use variable instead of module reference
   associate_public_ip_address = true
   key_name ="trojan"
+  lifecycle {
+    create_before_destroy = true
+  }
+  tags = {
+    Name = "Web Secondary"
+  }
 }
 
 
