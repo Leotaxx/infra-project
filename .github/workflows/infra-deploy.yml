@@ -28,7 +28,9 @@ jobs:
         run: terraform init -backend-config="bucket=infra-project-terraform-state-bucket"
         working-directory: terraform
       - name: Terraform Format Check
-        run: terraform fmt -check
+        run: |
+          terraform fmt -recursive
+          terraform fmt -check
         working-directory: terraform
       - name: Terraform Plan
         run: terraform plan -out=tfplan
