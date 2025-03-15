@@ -110,7 +110,7 @@ jobs:
           if [ -z "${{ env.DB_PASSWORD_SECRET_ARN }}" ]; then
             echo "Error: DB_PASSWORD_SECRET_ARN is missing!" && exit 1
           fi
-          echo "DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${{ env.DB_PASSWORD_SECRET_ARN }} --query 'SecretString' --output text)" >> $GITHUB_ENV
+          echo "DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${{ env.DB_PASSWORD_SECRET_ARN }} --query 'retail2025' --output text)" >> $GITHUB_ENV
       - name: Generate Ansible Inventory
         working-directory: ansible
         run: |
