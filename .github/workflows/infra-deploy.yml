@@ -49,14 +49,23 @@ jobs:
       - name: Set Terraform Outputs as Job Outputs
         id: export
         run: |
-          echo "DB_HOST: $(terraform output -raw db_host 2>/dev/null)"
-          echo "DB_PASSWORD_SECRET_ARN: $(terraform output -raw db_password_secret_arn 2>/dev/null)"
-          echo "WEB_PRIMARY_IP: $(terraform output -raw web_primary_ip 2>/dev/null)"
-          echo "WEB_SECONDARY_IP: $(terraform output -raw web_secondary_ip 2>/dev/null)"
-          echo "DB_HOST=$(terraform output -raw db_host 2>/dev/null | tr -d '\n')" >> $GITHUB_OUTPUT
-          echo "DB_PASSWORD_SECRET_ARN=$(terraform output -raw db_password_secret_arn 2>/dev/null | tr -d '\n')" >> $GITHUB_OUTPUT
-          echo "WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip 2>/dev/null | tr -d '\n')" >> $GITHUB_OUTPUT
-          echo "WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip 2>/dev/null | tr -d '\n')" >> $GITHUB_OUTPUT
+          echo "Extracting Terraform Outputs..."
+          DB_HOST=$(terraform output -raw db_host 2>/dev/null | tr -d '\n')
+          DB_PASSWORD_SECRET_ARN=$(terraform output -raw db_password_secret_arn 2>/dev/null | tr -d '\n')
+          WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip 2>/dev/null | tr -d '\n')
+          WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip 2>/dev/null | tr -d '\n')
+
+          # Debugging logs
+          echo "Extracted DB_HOST: $DB_HOST"
+          echo "Extracted DB_PASSWORD_SECRET_ARN: $DB_PASSWORD_SECRET_ARN"
+          echo "Extracted WEB_PRIMARY_IP: $WEB_PRIMARY_IP"
+          echo "Extracted WEB_SECONDARY_IP: $WEB_SECONDARY_IP"
+
+          # Store outputs in GITHUB_OUTPUT
+          echo "DB_HOST=$DB_HOST" >> $GITHUB_OUTPUT
+          echo "DB_PASSWORD_SECRET_ARN=$DB_PASSWORD_SECRET_ARN" >> $GITHUB_OUTPUT
+          echo "WEB_PRIMARY_IP=$WEB_PRIMARY_IP" >> $GITHUB_OUTPUT
+          echo "WEB_SECONDARY_IP=$WEB_SECONDARY_IP" >> $GITHUB_OUTPUT
         working-directory: terraform
       # - name: Upload Inventory JSON
       #   uses: actions/upload-artifact@v4
