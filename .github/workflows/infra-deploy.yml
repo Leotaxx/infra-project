@@ -35,7 +35,9 @@ jobs:
         run: terraform apply -auto-approve -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" -var "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" -var "aws_secret_session_token=${{ secrets.AWS_SESSION_TOKEN }}"
         working-directory: terraform
       - name: Update Inventory JSON
-        run: terraform output -json > $GITHUB_WORKSPACE/ansible/inventory.json
+        run: |
+          terraform output -json > $GITHUB_WORKSPACE/ansible/inventory.json
+          cat $GITHUB_WORKSPACE/ansible/inventory.json
         working-directory: terraform
 
   ansible:
