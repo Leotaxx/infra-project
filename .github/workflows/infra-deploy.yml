@@ -107,17 +107,17 @@ jobs:
           fi
       - name: Retrieve DB Password from AWS Secrets Manager
         run: |
-          env
           if [ -z "${{ env.DB_PASSWORD_SECRET_ARN }}" ]; then
             echo "Error: DB_PASSWORD_SECRET_ARN is missing!" && exit 1
           fi
           echo "DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${{ env.DB_PASSWORD_SECRET_ARN }} --query 'SecretString' --output text)" >> $GITHUB_ENV
       - name: Generate Ansible Inventory
+        working-directory: ansible
         run: |
-          echo "[webservers]" > ansible/inventory
-          echo "${{ env.WEB_PRIMARY_IP }}" >> ansible/inventory
-          echo "${{ env.WEB_SECONDARY_IP }}" >> ansible/inventory
-          working-directory: ansible
+          echo "[webservers]" > inventory
+          echo "${{ env.WEB_PRIMARY_IP }}" >> inventory
+          echo "${{ env.WEB_SECONDARY_IP }}" >> inventory
+
       - name: Run Ansible Playbook
         run: |
           ansible-playbook -i inventory webserver.yml
