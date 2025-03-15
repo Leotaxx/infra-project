@@ -9,6 +9,7 @@ resource "aws_db_instance" "rds" {
   parameter_group_name = "default.mysql8.0"
   publicly_accessible = true
   skip_final_snapshot = true
+  multi_az = true
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
   db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.name
 }
@@ -46,9 +47,7 @@ resource "aws_db_subnet_group" "rds_subnet_group" {
   subnet_ids = [var.public_subnet_1_id, var.public_subnet_2_id]  # Use the correct subnets
   description = "Subnet group for RDS instance"
 }
-resource "aws_db_instance" "rds" {
-  multi_az = true  # Enables automatic failover
-}
+
 resource "aws_db_instance" "read_replica" {
   replicate_source_db = aws_db_instance.rds.id
 }
