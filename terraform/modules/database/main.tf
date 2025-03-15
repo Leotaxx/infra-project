@@ -48,9 +48,11 @@ resource "aws_db_subnet_group" "rds_subnet_group" {
   description = "Subnet group for RDS instance"
 }
 
+/* 
 resource "aws_db_instance" "read_replica" {
   replicate_source_db = aws_db_instance.rds.id
-  instance_class      = "db.t3.micro"  # ✅ Add this line to define the instance type
+  instance_class      = "db.t3.micro"  
   publicly_accessible = false
   skip_final_snapshot = true
 }
+*/
