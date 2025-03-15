@@ -45,9 +45,10 @@ jobs:
       - name: Terraform Output
         id: terraform_output
         run: |
+          ls -l
           echo "WEB_PRIMARY_IP=$(terraform output -raw web_primary_ip)" >> $GITHUB_ENV
           echo "WEB_SECONDARY_IP=$(terraform output -raw web_secondary_ip)" >> $GITHUB_ENV
-        working-directory: infra-project/terraform # ✅ Set working directory
+        working-directory: terraform # ✅ Set working directory
 
       - name: Install Ansible
         run: sudo apt update && sudo apt install -y ansible
