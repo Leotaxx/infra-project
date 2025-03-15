@@ -63,6 +63,11 @@ jobs:
   ansible:
     needs: terraform
     runs-on: ubuntu-latest
+    env:
+      DB_HOST: ${{ needs.terraform.outputs.DB_HOST }}
+      DB_PASSWORD_SECRET_ARN: ${{ needs.terraform.outputs.DB_PASSWORD_SECRET_ARN }}
+      WEB_PRIMARY_IP: ${{ needs.terraform.outputs.WEB_PRIMARY_IP }}
+      WEB_SECONDARY_IP: ${{ needs.terraform.outputs.WEB_SECONDARY_IP }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
