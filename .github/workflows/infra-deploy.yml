@@ -134,6 +134,6 @@ jobs:
             echo "Error: Missing DB_HOST or DB_PASSWORD!" && exit 1
           fi
           mysql -h "${{ env.DB_HOST }}" -u admin -p"${{ env.DB_PASSWORD }}" -e "CREATE DATABASE IF NOT EXISTS retaildb;"
-      - name: Increase Connection Limit
-        run: |
-          mysql -h "${{ env.DB_HOST }}" -u admin -p"${{ env.DB_PASSWORD }}" -e "SET GLOBAL max_connections = 200;"
+      # - name: Increase Connection Limit . Not authorized to perform this
+      #   run: |
+      #     mysql -h "${{ env.DB_HOST }}" -u admin -p"${{ env.DB_PASSWORD }}" -e "SET GLOBAL max_connections = 200;"
