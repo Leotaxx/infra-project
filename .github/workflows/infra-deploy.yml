@@ -123,6 +123,12 @@ jobs:
           cat inventory
           ansible-playbook -i inventory webserver.yml
         working-directory: ansible
+      - name: Test Web Servers
+        run: |
+          echo "Testing Web Servers..."
+          curl -Is http://${{ env.WEB_PRIMARY_IP }} | head -n 1
+          curl -Is http://${{ env.WEB_SECONDARY_IP }} | head -n 1
+        working-directory: ansible
       - name: Install MySQL Client
         run: |
           sudo apt update
@@ -134,6 +140,8 @@ jobs:
             echo "Error: Missing DB_HOST or DB_PASSWORD!" && exit 1
           fi
           mysql -h "${{ env.DB_HOST }}" -u admin -p"${{ env.DB_PASSWORD }}" -e "CREATE DATABASE IF NOT EXISTS retaildb;"
+          echo "Testing MySQL Connection..."
+          mysql -h "${{ env.DB_HOST }}" -u admin -p"${{ env.DB_PASSWORD }}" -e "SHOW DATABASES;"
       # - name: Increase Connection Limit . Not authorized to perform this
       #   run: |
       #     mysql -h "${{ env.DB_HOST }}" -u admin -p"${{ env.DB_PASSWORD }}" -e "SET GLOBAL max_connections = 200;"
