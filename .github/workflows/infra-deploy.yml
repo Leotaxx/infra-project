@@ -120,6 +120,7 @@ jobs:
 
       - name: Run Ansible Playbook
         run: |
+          cat inventory
           ansible-playbook -i inventory webserver.yml
         working-directory: ansible
       - name: Install MySQL Client
