@@ -20,14 +20,10 @@ inventory = {
     "_meta": {
         "hostvars": {
             primary_ip: {
-                "ansible_user": "ec2-user",
-                "ansible_ssh_private_key_file": "~/.ssh/trojan.pem",
                 "db_host": db_host,
                 "db_password_secret_arn": db_password_secret_arn
             },
             secondary_ip: {
-                "ansible_user": "ec2-user",
-                "ansible_ssh_private_key_file": "~/.ssh/trojan.pem",
                 "db_host": db_host,
                 "db_password_secret_arn": db_password_secret_arn
             }
@@ -41,7 +37,20 @@ inventory = {
     }
 }
 
-inventory["_meta"]["hostvars"] = {k: v for k, v in inventory["_meta"]["hostvars"].items() if k}
+inventory["_meta"]["hostvars"] = {
+    k: {
+        "ansible_user": "ec2-user",
+        "ansible_ssh_private_key_file": "~/.ssh/trojan.pem",
+        "db_host": db_host,
+        "db_password_secret_arn": db_password_secret_arn
+    }
+    for k in inventory["_meta"]["hostvars"] if k
+}
+
 inventory["webservers"]["hosts"] = [h for h in inventory["webservers"]["hosts"] if h]
+
+if not inventory["webservers"]["hosts"]:
+    print("Error: No valid hosts found in inventory")
+    exit(1)
 
 print(json.dumps(inventory, indent=4))

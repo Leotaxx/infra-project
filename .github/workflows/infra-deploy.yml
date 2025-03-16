@@ -115,7 +115,7 @@ jobs:
         working-directory: ansible
         run: |
           echo "[webservers]" > inventory
-          echo "${{ env.WEB_PRIMARY_IP }} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/trojan.pem db_host=${{ env.DB_HOST }} db_password_secret_arn=${{ env.DB_PASSWORD_SECRET_ARN }}" >> inventory
+          echo "${{ env.WEB_PRIMARY_IP }} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/trojan.pem" >> inventory
           echo "${{ env.WEB_SECONDARY_IP }} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/trojan.pem" >> inventory
 
       - name: Run Ansible Playbook
