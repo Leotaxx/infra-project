@@ -97,6 +97,7 @@ jobs:
           chmod 600 ~/.ssh/trojan.pem
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/trojan.pem
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
       - name: Configure AWS Credentials
         run: |
           echo "Configuring AWS credentials..."
@@ -110,14 +111,13 @@ jobs:
           if [ -z "${{ env.DB_PASSWORD_SECRET_ARN }}" ]; then
             echo "Error: DB_PASSWORD_SECRET_ARN is missing!" && exit 1
           fi
-          echo "DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${{ env.DB_PASSWORD_SECRET_ARN }} --query 'retail2025' --output text)" >> $GITHUB_ENV
+          echo "DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${{ env.DB_PASSWORD_SECRET_ARN }} --query 'SecretString' --output text)" >> $GITHUB_ENV
       - name: Generate Ansible Inventory
         working-directory: ansible
         run: |
           echo "[webservers]" > inventory
-          echo "${{ env.WEB_PRIMARY_IP }} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/trojan.pem" >> inventory
-          echo "${{ env.WEB_SECONDARY_IP }} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/trojan.pem" >> inventory
-
+          echo "${{ env.WEB_PRIMARY_IP }} ansible_host=${{ env.WEB_PRIMARY_IP }} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/trojan.pem" >> inventory
+          echo "${{ env.WEB_SECONDARY_IP }} ansible_host=${{ env.WEB_SECONDARY_IP }} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/trojan.pem" >> inventory
       - name: Run Ansible Playbook
         run: |
           cat inventory
@@ -126,7 +126,7 @@ jobs:
       - name: Install MySQL Client
         run: |
           sudo apt update
-          sudo apt install -y python3-pip
+          sudo apt install -y mysql-client python3-pip
           pip3 install pymysql mysqlclient
       - name: Create Database
         run: |
